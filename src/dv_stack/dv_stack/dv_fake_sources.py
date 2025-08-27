@@ -1,179 +1,96 @@
 #!/usr/bin/env python3
 import math, numpy as np, rclpy
 from rclpy.node import Node
-from std_msgs.msg import Float32MultiArray
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Quaternion
 from visualization_msgs.msg import Marker, MarkerArray
-
 
 def yaw_to_quat(yaw: float) -> Quaternion:
     q = Quaternion()
     q.z = math.sin(yaw/2.0); q.w = math.cos(yaw/2.0)
     return q
 
-def rot(yaw: float) -> np.ndarray:
-    c, s = math.cos(yaw), math.sin(yaw)
-    return np.array([[c, -s],[s, c]], float)
+def pista_elipse(a=30.0, b=15.0, W=6.0, n=300):
+    """
+    Gera uma pista elíptica fechada.
+    a = semi-eixo X
+    b = semi-eixo Y
+    W = largura da pista
+    n = número de pontos
+    """
+    t = np.linspace(0, 2*math.pi, n, endpoint=False)
+    cx = a*np.cos(t)
+    cy = b*np.sin(t)
 
-# ---------- Geradores ----------
+    # tangentes e normais
+    dx, dy = np.gradient(cx), np.gradient(cy)
+    tvec = np.stack([dx, dy],1)
+    tvec /= np.maximum(np.linalg.norm(tvec, axis=1, keepdims=True), 1e-9)
+    nL = np.stack([-tvec[:,1], tvec[:,0]],1)
 
-def pista_minhoca(L=100.0, n=200, W=4.0, amp=10.0,
-                  n_voltas=4, raio_loop=15.0, n_circ=60):
-    xs = np.linspace(0, L, n)
-    ys = amp * np.sin(xs * (n_voltas*math.pi/L))
-    cx, cy = xs, ys
+    left  = np.stack([cx,cy],1)+(W/2.0)*nL
+    right = np.stack([cx,cy],1)-(W/2.0)*nL
+    return np.stack([cx,cy],1), left, right
 
-    # arco circular (meia-volta)
-    th = np.linspace(0, math.pi, n_circ)
-    circ_x = raio_loop*np.cos(th) + L
-    circ_y = raio_loop*np.sin(th)
-    cx = np.concatenate([cx, circ_x])
-    cy = np.concatenate([cy, circ_y])
-
-    # segmento de volta até 0,0
-    cx = np.concatenate([cx, np.linspace(circ_x[-1], 0.0, 50)])
-    cy = np.concatenate([cy, np.linspace(circ_y[-1], 0.0, 50)])
-
-    # bordas
-    dx = np.gradient(cx); dy = np.gradient(cy)
-    t = np.stack([dx, dy],1); t /= np.maximum(np.linalg.norm(t,axis=1,keepdims=True),1e-9)
-    nL = np.stack([-t[:,1], t[:,0]],1)
-
-    left  = np.stack([cx, cy],1) + (W/2.0)*nL
-    right = np.stack([cx, cy],1) - (W/2.0)*nL
-    return left, right
-
-
-def carregar_csv4_pairs(path):
-    """CSV com 4 colunas: xL,yL,xR,yR (sem cabeçalho)."""
-    arr = np.loadtxt(path, delimiter=',', dtype=float)
-    if arr.ndim == 1: arr = arr.reshape(1,4)
-    if arr.shape[1] != 4:
-        raise RuntimeError(f"CSV precisa ter 4 colunas, tem {arr.shape[1]}")
-    return arr[:,:2], arr[:,2:4]
-
-# ---------- Nó fake ----------
-class DVFakeSources(Node):
+class FakeTrack(Node):
     def __init__(self):
-        super().__init__('dv_fake_sources')
+        super().__init__('fake_track')
+        self.traj, self.left, self.right = pista_elipse()
+        self.i = 0
 
-        # parâmetros principais
-        self.declare_parameter('freq_hz',20.0)
-        self.declare_parameter('tipo_pista','minhoca')  # minhoca ou csv4
-        self.declare_parameter('comprimento_pista',100.0)
-        self.declare_parameter('largura_pista',4.0)
-        self.declare_parameter('csv_pairs','')  # caminho do csv 4-colunas
+        self.pub_odom = self.create_publisher(Odometry,'/odom',10)
+        self.pub_map  = self.create_publisher(MarkerArray,'/map_cones',10)
 
-        # “sensor”/ruído
-        self.declare_parameter('vel_media',4.0)
-        self.declare_parameter('alcance_m',25.0)
-        self.declare_parameter('fov_graus',120.0)
-        self.declare_parameter('sigma_meas_cone',0.05)
-        self.declare_parameter('prob_dropout',0.10)
-        self.declare_parameter('sigma_odom_xy',0.03)
-        self.declare_parameter('sigma_odom_yaw_graus',1.0)
+        # timers
+        self.timer_pose = self.create_timer(0.05, self.tick)        # carro se move
+        self.timer_map  = self.create_timer(1.0, self.publish_map)  # cones 1 Hz
 
-        tipo = self.get_parameter('tipo_pista').value
-        L = float(self.get_parameter('comprimento_pista').value)
-        W = float(self.get_parameter('largura_pista').value)
-
-        if tipo == 'csv4':
-            path = str(self.get_parameter('csv_pairs').value)
-            if not path:
-                raise RuntimeError("tipo_pista=csv4 requer csv_pairs:=/caminho/track_pairs.csv")
-            self.left_world, self.right_world = carregar_csv4_pairs(path)
-        else:
-            self.left_world, self.right_world = pista_minhoca(L=L,W=W)
-
-        # estado
-        self.v = float(self.get_parameter('vel_media').value)
-        self.range = float(self.get_parameter('alcance_m').value)
-        self.fov = math.radians(float(self.get_parameter('fov_graus').value))
-        self.sig_meas = float(self.get_parameter('sigma_meas_cone').value)
-        self.p_drop = float(self.get_parameter('prob_dropout').value)
-        self.sig_odom_xy = float(self.get_parameter('sigma_odom_xy').value)
-        self.sig_odom_yaw = math.radians(float(self.get_parameter('sigma_odom_yaw_graus').value))
-
-        self.s = 0
-        self.traj = 0.5*(self.left_world+self.right_world)  # linha central
-        self.Ntraj = len(self.traj)
-
-        # pubs
-        self.pub_odom  = self.create_publisher(Odometry,'/odom',10)
-        self.pub_cones = self.create_publisher(Float32MultiArray,'/cones',10)
-        self.pub_markers = self.create_publisher(MarkerArray, '/cones_markers', 10)
-        self.timer = self.create_timer(1.0/float(self.get_parameter('freq_hz').value),self.tick)
-
-    def pose_true(self, i):
-        i0, i1 = i%self.Ntraj, (i+1)%self.Ntraj
-        p0, p1 = self.traj[i0], self.traj[i1]
-        yaw = math.atan2(p1[1]-p0[1], p1[0]-p0[0])
-        return p0[0], p0[1], yaw
-
-    def tick(self):
-        self.s = (self.s+1)%self.Ntraj
-        x_true,y_true,yaw_true = self.pose_true(self.s)
-
-        # publica odom com ruído
-        odom = Odometry()
-        now = self.get_clock().now().to_msg()
-        odom.header.stamp = now; odom.header.frame_id='odom'; odom.child_frame_id='base_link'
-        odom.pose.pose.position.x = x_true+np.random.normal(0,self.sig_odom_xy)
-        odom.pose.pose.position.y = y_true+np.random.normal(0,self.sig_odom_xy)
-        odom.pose.pose.orientation = yaw_to_quat(yaw_true+np.random.normal(0,self.sig_odom_yaw))
-        odom.twist.twist.linear.x = self.v
-        self.pub_odom.publish(odom)
-
-        # publica cones no frame base_link
-        Rt = rot(yaw_true).T
-        car_pos = np.array([x_true,y_true])
-        detections = []
-        for side, arr in [(1.0,self.left_world),(2.0,self.right_world)]:
-            for pw in arr:
-                pb = Rt @ (pw-car_pos)
-                xb,yb = float(pb[0]), float(pb[1])
-                if xb<0.2 or xb>self.range: continue
-                ang = math.atan2(yb,xb)
-                if abs(ang)>self.fov/2: continue
-                if np.random.rand()<self.p_drop: continue
-                xb+=np.random.normal(0,self.sig_meas); yb+=np.random.normal(0,self.sig_meas)
-                detections.extend([xb,yb,side])
-        self.pub_cones.publish(Float32MultiArray(data=detections))
-        # -------- RViz markers --------
+    def publish_map(self):
         msg = MarkerArray()
         clear = Marker()
         clear.action = Marker.DELETEALL
         msg.markers.append(clear)
 
         mid = 0
-        for i in range(0, len(detections), 3):
-            xb, yb, side = detections[i:i+3]
-            m = Marker()
-            m.header.frame_id = 'base_link'
-            m.header.stamp = now
-            m.ns = "cones"
-            m.id = mid; mid += 1
-            m.type = Marker.SPHERE
-            m.action = Marker.ADD
-            m.pose.position.x = float(xb)
-            m.pose.position.y = float(yb)
-            m.pose.position.z = 0.0
-            m.scale.x = m.scale.y = m.scale.z = 0.35
-            if side == 1.0:      # esquerda
-                m.color.r, m.color.g, m.color.b, m.color.a = 0.0, 0.5, 1.0, 1.0
-            else:                # direita
-                m.color.r, m.color.g, m.color.b, m.color.a = 1.0, 0.85, 0.0, 1.0
-            msg.markers.append(m)
+        for arr, color in [(self.left,(0.0,0.0,1.0)), (self.right,(1.0,1.0,0.0))]:
+            for x,y in arr:
+                m = Marker()
+                m.header.frame_id='map'
+                m.header.stamp=self.get_clock().now().to_msg()
+                m.ns='cones'; m.id=mid; mid+=1
+                m.type=Marker.SPHERE; m.action=Marker.ADD
+                m.pose.position.x=float(x); m.pose.position.y=float(y); m.pose.position.z=0.0
+                m.scale.x=m.scale.y=m.scale.z=0.4
+                m.color.r=float(color[0]); m.color.g=float(color[1]); m.color.b=float(color[2]); m.color.a=1.0
+                msg.markers.append(m)
 
-        self.pub_markers.publish(msg)
+        self.pub_map.publish(msg)
+
+    def tick(self):
+        # carro avança na elipse
+        self.i = (self.i+1)%len(self.traj)
+        x,y = self.traj[self.i]
+        x2,y2 = self.traj[(self.i+1)%len(self.traj)]
+        yaw = math.atan2(y2-y, x2-x)
+
+        od = Odometry()
+        od.header.frame_id='map'; od.child_frame_id='base_link'
+        od.header.stamp=self.get_clock().now().to_msg()
+        od.pose.pose.position.x=float(x); od.pose.pose.position.y=float(y)
+        od.pose.pose.orientation=yaw_to_quat(yaw)
+        od.twist.twist.linear.x=3.0
+        self.pub_odom.publish(od)
 
 def main():
     rclpy.init()
-    node = DVFakeSources()
+    node=FakeTrack()
     rclpy.spin(node)
     node.destroy_node(); rclpy.shutdown()
 
-if __name__=='__main__':
+if __name__=="__main__":
     main()
+
+
+
+
 

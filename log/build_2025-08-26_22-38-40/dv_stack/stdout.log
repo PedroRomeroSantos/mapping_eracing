@@ -1,0 +1,24 @@
+running develop
+running egg_info
+creating dv_stack.egg-info
+writing dv_stack.egg-info/PKG-INFO
+writing dependency_links to dv_stack.egg-info/dependency_links.txt
+writing entry points to dv_stack.egg-info/entry_points.txt
+writing requirements to dv_stack.egg-info/requires.txt
+writing top-level names to dv_stack.egg-info/top_level.txt
+writing manifest file 'dv_stack.egg-info/SOURCES.txt'
+reading manifest file 'dv_stack.egg-info/SOURCES.txt'
+writing manifest file 'dv_stack.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/pedro/mapping_eracing/install/dv_stack/lib/python3.8/site-packages/site.py
+Creating /home/pedro/mapping_eracing/install/dv_stack/lib/python3.8/site-packages/dv-stack.egg-link (link to .)
+Installing dv_fake_sources script to /home/pedro/mapping_eracing/install/dv_stack/lib/dv_stack
+Installing dv_planner_node script to /home/pedro/mapping_eracing/install/dv_stack/lib/dv_stack
+
+Installed /home/pedro/mapping_eracing/build/dv_stack
+running symlink_data
+creating /home/pedro/mapping_eracing/install/dv_stack/share/ament_index
+creating /home/pedro/mapping_eracing/install/dv_stack/share/ament_index/resource_index
+creating /home/pedro/mapping_eracing/install/dv_stack/share/ament_index/resource_index/packages
+symbolically linking /home/pedro/mapping_eracing/build/dv_stack/resource/dv_stack -> /home/pedro/mapping_eracing/install/dv_stack/share/ament_index/resource_index/packages
+symbolically linking /home/pedro/mapping_eracing/build/dv_stack/package.xml -> /home/pedro/mapping_eracing/install/dv_stack/share/dv_stack

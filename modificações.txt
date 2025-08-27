@@ -1,8 +1,20 @@
-pra publicar pistas diferentes mexendo só no nó “fake”. Abaixo te deixo uma versão do dv_fake_sources.py com um parâmetro novo tipo_pista, para escolher entre:
-ros2 run dv_stack dv_fake_sources --ros-args -p tipo_pista:=minhoca -p comprimento_pista:=120.0 -p largura_pista:=5.0
+Sempre dar 
+source /opt/ros/foxy/setup.bash
+colcon build --symlink-install
+source ~/mapping_eracing/install/setup.bash
 
-
+ros2 run dv_stack dv_fake_sources --ros-args -p tipo_pista:=minhoca_loop
+ou
 #csv
 ros2 run dv_stack dv_fake_sources --ros-args \
   -p tipo_pista:=csv4 \
   -p csv_pairs:=/caminho/para/track_pairs.csv
+
+  
+ros2 run dv_stack dv_planner_node --ros-args \
+  -p associacao_raio:=1.4 \
+  -p ds_metros:=0.5 \
+  -p janela_waypoints_m:=35.0 \
+  -p suavizacao_alpha:=0.35
+
+
