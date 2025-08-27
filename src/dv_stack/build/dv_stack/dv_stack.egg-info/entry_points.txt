@@ -1,0 +1,4 @@
+[console_scripts]
+dv_fake_sources = dv_stack.dv_fake_sources:main
+dv_planner_node = dv_stack.dv_planner_node:main
+
