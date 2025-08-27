@@ -4,6 +4,8 @@ from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Quaternion
+from visualization_msgs.msg import Marker, MarkerArray
+
 
 def yaw_to_quat(yaw: float) -> Quaternion:
     q = Quaternion()
@@ -16,25 +18,24 @@ def rot(yaw: float) -> np.ndarray:
 
 # ---------- Geradores ----------
 
-def pista_minhoca(L=100.0, n=200, W=4.0, amp=10.0, n_voltas=4,
-                  raio_loop=15.0, n_circ=60):
-    """
-    Linha central: serpenteia no eixo X (senóide) e termina
-    com um arco circular para voltar pro início.
-    """
-    # serpente
+def pista_minhoca(L=100.0, n=200, W=4.0, amp=10.0,
+                  n_voltas=4, raio_loop=15.0, n_circ=60):
     xs = np.linspace(0, L, n)
     ys = amp * np.sin(xs * (n_voltas*math.pi/L))
     cx, cy = xs, ys
 
-    # arco circular de retorno
-    th = np.linspace(0, math.pi, n_circ)  # meia-volta
+    # arco circular (meia-volta)
+    th = np.linspace(0, math.pi, n_circ)
     circ_x = raio_loop*np.cos(th) + L
-    circ_y = raio_loop*np.sin(th) + 0.0
+    circ_y = raio_loop*np.sin(th)
     cx = np.concatenate([cx, circ_x])
     cy = np.concatenate([cy, circ_y])
 
-    # tangente -> normais -> bordas
+    # segmento de volta até 0,0
+    cx = np.concatenate([cx, np.linspace(circ_x[-1], 0.0, 50)])
+    cy = np.concatenate([cy, np.linspace(circ_y[-1], 0.0, 50)])
+
+    # bordas
     dx = np.gradient(cx); dy = np.gradient(cy)
     t = np.stack([dx, dy],1); t /= np.maximum(np.linalg.norm(t,axis=1,keepdims=True),1e-9)
     nL = np.stack([-t[:,1], t[:,0]],1)
@@ -42,6 +43,7 @@ def pista_minhoca(L=100.0, n=200, W=4.0, amp=10.0, n_voltas=4,
     left  = np.stack([cx, cy],1) + (W/2.0)*nL
     right = np.stack([cx, cy],1) - (W/2.0)*nL
     return left, right
+
 
 def carregar_csv4_pairs(path):
     """CSV com 4 colunas: xL,yL,xR,yR (sem cabeçalho)."""
@@ -100,6 +102,7 @@ class DVFakeSources(Node):
         # pubs
         self.pub_odom  = self.create_publisher(Odometry,'/odom',10)
         self.pub_cones = self.create_publisher(Float32MultiArray,'/cones',10)
+        self.pub_markers = self.create_publisher(MarkerArray, '/cones_markers', 10)
         self.timer = self.create_timer(1.0/float(self.get_parameter('freq_hz').value),self.tick)
 
     def pose_true(self, i):
@@ -137,6 +140,33 @@ class DVFakeSources(Node):
                 xb+=np.random.normal(0,self.sig_meas); yb+=np.random.normal(0,self.sig_meas)
                 detections.extend([xb,yb,side])
         self.pub_cones.publish(Float32MultiArray(data=detections))
+        # -------- RViz markers --------
+        msg = MarkerArray()
+        clear = Marker()
+        clear.action = Marker.DELETEALL
+        msg.markers.append(clear)
+
+        mid = 0
+        for i in range(0, len(detections), 3):
+            xb, yb, side = detections[i:i+3]
+            m = Marker()
+            m.header.frame_id = 'base_link'
+            m.header.stamp = now
+            m.ns = "cones"
+            m.id = mid; mid += 1
+            m.type = Marker.SPHERE
+            m.action = Marker.ADD
+            m.pose.position.x = float(xb)
+            m.pose.position.y = float(yb)
+            m.pose.position.z = 0.0
+            m.scale.x = m.scale.y = m.scale.z = 0.35
+            if side == 1.0:      # esquerda
+                m.color.r, m.color.g, m.color.b, m.color.a = 0.0, 0.5, 1.0, 1.0
+            else:                # direita
+                m.color.r, m.color.g, m.color.b, m.color.a = 1.0, 0.85, 0.0, 1.0
+            msg.markers.append(m)
+
+        self.pub_markers.publish(msg)
 
 def main():
     rclpy.init()

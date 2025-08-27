@@ -1,0 +1,18 @@
+[0.318s] Invoking command in '/home/pedroromero/mapping_eracing/build/dv_stack': PYTHONPATH=/home/pedroromero/mapping_eracing/build/dv_stack/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pedroromero/mapping_eracing/install/dv_stack/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pedroromero/mapping_eracing/build/dv_stack/build --no-deps symlink_data
+[0.446s] running develop
+[0.513s] running egg_info
+[0.514s] writing dv_stack.egg-info/PKG-INFO
+[0.514s] writing dependency_links to dv_stack.egg-info/dependency_links.txt
+[0.514s] writing entry points to dv_stack.egg-info/entry_points.txt
+[0.514s] writing requirements to dv_stack.egg-info/requires.txt
+[0.514s] writing top-level names to dv_stack.egg-info/top_level.txt
+[0.514s] reading manifest file 'dv_stack.egg-info/SOURCES.txt'
+[0.515s] writing manifest file 'dv_stack.egg-info/SOURCES.txt'
+[0.516s] running build_ext
+[0.516s] Creating /home/pedroromero/mapping_eracing/install/dv_stack/lib/python3.10/site-packages/dv-stack.egg-link (link to .)
+[0.516s] Installing dv_fake_sources script to /home/pedroromero/mapping_eracing/install/dv_stack/lib/dv_stack
+[0.516s] Installing dv_planner_node script to /home/pedroromero/mapping_eracing/install/dv_stack/lib/dv_stack
+[0.516s] 
+[0.516s] Installed /home/pedroromero/mapping_eracing/build/dv_stack
+[0.516s] running symlink_data
+[0.534s] Invoked command in '/home/pedroromero/mapping_eracing/build/dv_stack' returned '0': PYTHONPATH=/home/pedroromero/mapping_eracing/build/dv_stack/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pedroromero/mapping_eracing/install/dv_stack/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/pedroromero/mapping_eracing/build/dv_stack/build --no-deps symlink_data

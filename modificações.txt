@@ -1,23 +1,6 @@
 pra publicar pistas diferentes mexendo só no nó “fake”. Abaixo te deixo uma versão do dv_fake_sources.py com um parâmetro novo tipo_pista, para escolher entre:
-S (padrão)
-reta
-oval
-hairpin (cotovelo)
-slalom
-fig8 (oito)
-csv 
+ros2 run dv_stack dv_fake_sources --ros-args -p tipo_pista:=minhoca -p comprimento_pista:=120.0 -p largura_pista:=5.0
 
-# oval
-ros2 run dv_stack dv_fake_sources --ros-args -p tipo_pista:=oval -p comprimento_pista:=150.0 -p largura_pista:=5.0
-
-# hairpin
-ros2 run dv_stack dv_fake_sources --ros-args -p tipo_pista:=hairpin -p largura_pista:=4.0
-
-# reta longa
-ros2 run dv_stack dv_fake_sources --ros-args -p tipo_pista:=reta -p comprimento_pista:=200.0
-
-# slalom
-ros2 run dv_stack dv_fake_sources --ros-args -p tipo_pista:=slalom -p comprimento_pista:=120.0 -p largura_pista:=4.0
 
 #csv
 ros2 run dv_stack dv_fake_sources --ros-args \
