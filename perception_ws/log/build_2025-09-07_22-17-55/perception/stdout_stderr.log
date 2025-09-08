@@ -1,0 +1,53 @@
+/home/pedro/.local/lib/python3.8/site-packages/setuptools/dist.py:717: UserWarning: Usage of dash-separated 'script-dir' will not be supported in future versions. Please use the underscore name 'script_dir' instead
+  warnings.warn(
+running egg_info
+creating ../../build/perception/perception.egg-info
+writing ../../build/perception/perception.egg-info/PKG-INFO
+writing dependency_links to ../../build/perception/perception.egg-info/dependency_links.txt
+writing entry points to ../../build/perception/perception.egg-info/entry_points.txt
+writing requirements to ../../build/perception/perception.egg-info/requires.txt
+writing top-level names to ../../build/perception/perception.egg-info/top_level.txt
+writing manifest file '../../build/perception/perception.egg-info/SOURCES.txt'
+reading manifest file '../../build/perception/perception.egg-info/SOURCES.txt'
+writing manifest file '../../build/perception/perception.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/pedro/perception_ws/build/perception/build
+creating /home/pedro/perception_ws/build/perception/build/lib
+creating /home/pedro/perception_ws/build/perception/build/lib/perception
+copying perception/cone_map.py -> /home/pedro/perception_ws/build/perception/build/lib/perception
+copying perception/processingLado.py -> /home/pedro/perception_ws/build/perception/build/lib/perception
+copying perception/__init__.py -> /home/pedro/perception_ws/build/perception/build/lib/perception
+copying perception/yoloTest.py -> /home/pedro/perception_ws/build/perception/build/lib/perception
+copying perception/processing.py -> /home/pedro/perception_ws/build/perception/build/lib/perception
+copying perception/keyboard_control.py -> /home/pedro/perception_ws/build/perception/build/lib/perception
+running install
+running install_lib
+creating /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception
+copying /home/pedro/perception_ws/build/perception/build/lib/perception/cone_map.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception
+copying /home/pedro/perception_ws/build/perception/build/lib/perception/processingLado.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception
+copying /home/pedro/perception_ws/build/perception/build/lib/perception/__init__.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception
+copying /home/pedro/perception_ws/build/perception/build/lib/perception/yoloTest.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception
+copying /home/pedro/perception_ws/build/perception/build/lib/perception/processing.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception
+copying /home/pedro/perception_ws/build/perception/build/lib/perception/keyboard_control.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception
+byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/cone_map.py to cone_map.cpython-38.pyc
+byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/processingLado.py to processingLado.cpython-38.pyc
+byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/__init__.py to __init__.cpython-38.pyc
+byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/yoloTest.py to yoloTest.cpython-38.pyc
+byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/processing.py to processing.cpython-38.pyc
+byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/keyboard_control.py to keyboard_control.cpython-38.pyc
+running install_data
+creating /home/pedro/perception_ws/install/perception/share/ament_index
+creating /home/pedro/perception_ws/install/perception/share/ament_index/resource_index
+creating /home/pedro/perception_ws/install/perception/share/ament_index/resource_index/packages
+copying resource/perception -> /home/pedro/perception_ws/install/perception/share/ament_index/resource_index/packages
+copying package.xml -> /home/pedro/perception_ws/install/perception/share/perception
+running install_egg_info
+Copying ../../build/perception/perception.egg-info to /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception-0.0.0-py3.8.egg-info
+running install_scripts
+Installing cone_map script to /home/pedro/perception_ws/install/perception/lib/perception
+Installing keyboard_control script to /home/pedro/perception_ws/install/perception/lib/perception
+Installing processing script to /home/pedro/perception_ws/install/perception/lib/perception
+Installing processing_lado script to /home/pedro/perception_ws/install/perception/lib/perception
+Installing yolo_test script to /home/pedro/perception_ws/install/perception/lib/perception
+writing list of installed files to '/home/pedro/perception_ws/build/perception/install.log'

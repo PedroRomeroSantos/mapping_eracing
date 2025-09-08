@@ -1,0 +1,7 @@
+[console_scripts]
+cone_map = perception.cone_map:main
+keyboard_control = perception.keyboard_control:main
+processing = perception.processing:main
+processing_lado = perception.processingLado:main
+yolo_test = perception.yoloTest:main
+
