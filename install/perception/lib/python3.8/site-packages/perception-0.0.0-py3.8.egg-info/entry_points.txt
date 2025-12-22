@@ -1,0 +1,8 @@
+[console_scripts]
+control = perception.control:main
+keyboard_control = perception.keyboard_control:main
+novo_path = perception.novo_path:main
+path_control = perception.path_control:main
+path_planner = perception.path_planner:main
+processing = perception.processing:main
+

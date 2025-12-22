@@ -1,0 +1,63 @@
+[0.000000] (-) TimerEvent: {}
+[0.000310] (perception) JobQueued: {'identifier': 'perception', 'dependencies': OrderedDict()}
+[0.000338] (perception) JobStarted: {'identifier': 'perception'}
+[0.099876] (-) TimerEvent: {}
+[0.200265] (-) TimerEvent: {}
+[0.300599] (-) TimerEvent: {}
+[0.324367] (perception) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../build/perception', 'build', '--build-base', '/home/pedro/perception_ws/build/perception/build', 'install', '--record', '/home/pedro/perception_ws/build/perception/install.log', '--install-scripts', '$base/lib/perception', '--single-version-externally-managed', 'install_data'], 'cwd': '/home/pedro/perception_ws/src/perception', 'env': {'GJS_DEBUG_TOPICS': 'JS ERROR;JS LOG', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'pedro', 'LC_TIME': 'en_US.UTF-8', 'SSH_AGENT_PID': '1332', 'XDG_SESSION_TYPE': 'x11', 'SHLVL': '1', 'HOME': '/home/pedro', 'OLDPWD': '/home/pedro/perception_ws', 'DESKTOP_SESSION': 'ubuntu', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'GTK_MODULES': 'gail:atk-bridge', 'LC_MONETARY': 'en_US.UTF-8', 'MANAGERPID': '1189', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'IM_CONFIG_PHASE': '1', 'LOGNAME': 'pedro', 'JOURNAL_STREAM': '8:42264', '_': '/usr/bin/colcon', 'XDG_SESSION_CLASS': 'user', 'USERNAME': 'pedro', 'TERM': 'xterm-256color', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'WINDOWPATH': '2', 'PATH': '/home/pedro/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'SESSION_MANAGER': 'local/pedro-computer:@/tmp/.ICE-unix/1369,unix/pedro-computer:/tmp/.ICE-unix/1369', 'INVOCATION_ID': '25f09281f50c411f98f8bb97d2ec10a2', 'PAPERSIZE': 'letter', 'XDG_MENU_PREFIX': 'gnome-', 'LC_ADDRESS': 'en_US.UTF-8', 'GNOME_TERMINAL_SCREEN': '/org/gnome/Terminal/screen/d5fe04d0_9bb1_4d51_a70d_e33ce1790b48', 'XDG_RUNTIME_DIR': '/run/user/1000', 'DISPLAY': ':0', 'LANG': 'en_US.UTF-8', 'XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'LC_TELEPHONE': 'en_US.UTF-8', 'XMODIFIERS': '@im=ibus', 'XDG_SESSION_DESKTOP': 'ubuntu', 'XAUTHORITY': '/run/user/1000/gdm/Xauthority', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'GNOME_TERMINAL_SERVICE': ':1.98', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'SHELL': '/bin/bash', 'LC_NAME': 'en_US.UTF-8', 'QT_ACCESSIBILITY': '1', 'GDMSESSION': 'ubuntu', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'LC_MEASUREMENT': 'en_US.UTF-8', 'GPG_AGENT_INFO': '/run/user/1000/gnupg/S.gpg-agent:0:1', 'GJS_DEBUG_OUTPUT': 'stderr', 'LC_IDENTIFICATION': 'en_US.UTF-8', 'QT_IM_MODULE': 'ibus', 'PWD': '/home/pedro/perception_ws/build/perception', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'XDG_DATA_DIRS': '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'LC_NUMERIC': 'en_US.UTF-8', 'LC_PAPER': 'en_US.UTF-8', 'COLCON': '1', 'VTE_VERSION': '6003', 'PYTHONPATH': '/home/pedro/perception_ws/build/perception/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pedro/perception_ws/install/perception/lib/python3.8/site-packages:'}, 'shell': False}
+[0.400714] (-) TimerEvent: {}
+[0.416959] (perception) StderrLine: {'line': b"/home/pedro/.local/lib/python3.8/site-packages/setuptools/dist.py:717: UserWarning: Usage of dash-separated 'script-dir' will not be supported in future versions. Please use the underscore name 'script_dir' instead\n"}
+[0.417162] (perception) StderrLine: {'line': b'  warnings.warn(\n'}
+[0.428436] (perception) StdoutLine: {'line': b'running egg_info\n'}
+[0.428651] (perception) StdoutLine: {'line': b'creating ../../build/perception/perception.egg-info\n'}
+[0.428742] (perception) StdoutLine: {'line': b'writing ../../build/perception/perception.egg-info/PKG-INFO\n'}
+[0.428829] (perception) StdoutLine: {'line': b'writing dependency_links to ../../build/perception/perception.egg-info/dependency_links.txt\n'}
+[0.428978] (perception) StdoutLine: {'line': b'writing entry points to ../../build/perception/perception.egg-info/entry_points.txt\n'}
+[0.429036] (perception) StdoutLine: {'line': b'writing requirements to ../../build/perception/perception.egg-info/requires.txt\n'}
+[0.429086] (perception) StdoutLine: {'line': b'writing top-level names to ../../build/perception/perception.egg-info/top_level.txt\n'}
+[0.430243] (perception) StdoutLine: {'line': b"writing manifest file '../../build/perception/perception.egg-info/SOURCES.txt'\n"}
+[0.430935] (perception) StdoutLine: {'line': b"reading manifest file '../../build/perception/perception.egg-info/SOURCES.txt'\n"}
+[0.431254] (perception) StdoutLine: {'line': b"writing manifest file '../../build/perception/perception.egg-info/SOURCES.txt'\n"}
+[0.431370] (perception) StdoutLine: {'line': b'running build\n'}
+[0.431443] (perception) StdoutLine: {'line': b'running build_py\n'}
+[0.431539] (perception) StdoutLine: {'line': b'creating /home/pedro/perception_ws/build/perception/build\n'}
+[0.431628] (perception) StdoutLine: {'line': b'creating /home/pedro/perception_ws/build/perception/build/lib\n'}
+[0.431694] (perception) StdoutLine: {'line': b'creating /home/pedro/perception_ws/build/perception/build/lib/perception\n'}
+[0.431783] (perception) StdoutLine: {'line': b'copying perception/__init__.py -> /home/pedro/perception_ws/build/perception/build/lib/perception\n'}
+[0.431847] (perception) StdoutLine: {'line': b'copying perception/path_planner.py -> /home/pedro/perception_ws/build/perception/build/lib/perception\n'}
+[0.431910] (perception) StdoutLine: {'line': b'copying perception/processing_original.py -> /home/pedro/perception_ws/build/perception/build/lib/perception\n'}
+[0.431972] (perception) StdoutLine: {'line': b'copying perception/processing.py -> /home/pedro/perception_ws/build/perception/build/lib/perception\n'}
+[0.432035] (perception) StdoutLine: {'line': b'copying perception/keyboard_control.py -> /home/pedro/perception_ws/build/perception/build/lib/perception\n'}
+[0.432100] (perception) StdoutLine: {'line': b'copying perception/novo_path.py -> /home/pedro/perception_ws/build/perception/build/lib/perception\n'}
+[0.432162] (perception) StdoutLine: {'line': b'running install\n'}
+[0.432243] (perception) StdoutLine: {'line': b'running install_lib\n'}
+[0.432525] (perception) StdoutLine: {'line': b'creating /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception\n'}
+[0.432610] (perception) StdoutLine: {'line': b'copying /home/pedro/perception_ws/build/perception/build/lib/perception/__init__.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception\n'}
+[0.432707] (perception) StdoutLine: {'line': b'copying /home/pedro/perception_ws/build/perception/build/lib/perception/path_planner.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception\n'}
+[0.432781] (perception) StdoutLine: {'line': b'copying /home/pedro/perception_ws/build/perception/build/lib/perception/processing_original.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception\n'}
+[0.432857] (perception) StdoutLine: {'line': b'copying /home/pedro/perception_ws/build/perception/build/lib/perception/processing.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception\n'}
+[0.432923] (perception) StdoutLine: {'line': b'copying /home/pedro/perception_ws/build/perception/build/lib/perception/keyboard_control.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception\n'}
+[0.432969] (perception) StdoutLine: {'line': b'copying /home/pedro/perception_ws/build/perception/build/lib/perception/novo_path.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception\n'}
+[0.433080] (perception) StdoutLine: {'line': b'byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/__init__.py to __init__.cpython-38.pyc\n'}
+[0.433192] (perception) StdoutLine: {'line': b'byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/path_planner.py to path_planner.cpython-38.pyc\n'}
+[0.433887] (perception) StdoutLine: {'line': b'byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/processing_original.py to processing_original.cpython-38.pyc\n'}
+[0.434202] (perception) StdoutLine: {'line': b'byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/processing.py to processing.cpython-38.pyc\n'}
+[0.434526] (perception) StdoutLine: {'line': b'byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/keyboard_control.py to keyboard_control.cpython-38.pyc\n'}
+[0.434745] (perception) StdoutLine: {'line': b'byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/novo_path.py to novo_path.cpython-38.pyc\n'}
+[0.435383] (perception) StdoutLine: {'line': b'running install_data\n'}
+[0.435476] (perception) StdoutLine: {'line': b'creating /home/pedro/perception_ws/install/perception/share/ament_index\n'}
+[0.435550] (perception) StdoutLine: {'line': b'creating /home/pedro/perception_ws/install/perception/share/ament_index/resource_index\n'}
+[0.435624] (perception) StdoutLine: {'line': b'creating /home/pedro/perception_ws/install/perception/share/ament_index/resource_index/packages\n'}
+[0.435682] (perception) StdoutLine: {'line': b'copying resource/perception -> /home/pedro/perception_ws/install/perception/share/ament_index/resource_index/packages\n'}
+[0.435733] (perception) StdoutLine: {'line': b'copying package.xml -> /home/pedro/perception_ws/install/perception/share/perception\n'}
+[0.435785] (perception) StdoutLine: {'line': b'running install_egg_info\n'}
+[0.436271] (perception) StdoutLine: {'line': b'Copying ../../build/perception/perception.egg-info to /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception-0.0.0-py3.8.egg-info\n'}
+[0.436755] (perception) StdoutLine: {'line': b'running install_scripts\n'}
+[0.445434] (perception) StdoutLine: {'line': b'Installing keyboard_control script to /home/pedro/perception_ws/install/perception/lib/perception\n'}
+[0.445580] (perception) StdoutLine: {'line': b'Installing novo_path script to /home/pedro/perception_ws/install/perception/lib/perception\n'}
+[0.445640] (perception) StdoutLine: {'line': b'Installing path_planner script to /home/pedro/perception_ws/install/perception/lib/perception\n'}
+[0.445691] (perception) StdoutLine: {'line': b'Installing processing script to /home/pedro/perception_ws/install/perception/lib/perception\n'}
+[0.445767] (perception) StdoutLine: {'line': b"writing list of installed files to '/home/pedro/perception_ws/build/perception/install.log'\n"}
+[0.457894] (perception) CommandEnded: {'returncode': 0}
+[0.467217] (perception) JobEnded: {'identifier': 'perception', 'rc': 0}
+[0.467589] (-) EventReactorShutdown: {}

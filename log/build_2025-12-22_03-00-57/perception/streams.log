@@ -1,0 +1,31 @@
+[0.538s] Invoking command in '/home/pedro/perception_ws/src/perception': PYTHONPATH=/home/pedro/perception_ws/build/perception/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pedro/perception_ws/install/perception/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/perception build --build-base /home/pedro/perception_ws/build/perception/build install --record /home/pedro/perception_ws/build/perception/install.log --install-scripts $base/lib/perception --single-version-externally-managed install_data
+[0.710s] /home/pedro/.local/lib/python3.8/site-packages/setuptools/dist.py:717: UserWarning: Usage of dash-separated 'script-dir' will not be supported in future versions. Please use the underscore name 'script_dir' instead
+[0.710s]   warnings.warn(
+[0.726s] running egg_info
+[0.726s] writing ../../build/perception/perception.egg-info/PKG-INFO
+[0.727s] writing dependency_links to ../../build/perception/perception.egg-info/dependency_links.txt
+[0.727s] writing entry points to ../../build/perception/perception.egg-info/entry_points.txt
+[0.727s] writing requirements to ../../build/perception/perception.egg-info/requires.txt
+[0.727s] writing top-level names to ../../build/perception/perception.egg-info/top_level.txt
+[0.728s] reading manifest file '../../build/perception/perception.egg-info/SOURCES.txt'
+[0.729s] writing manifest file '../../build/perception/perception.egg-info/SOURCES.txt'
+[0.729s] running build
+[0.729s] running build_py
+[0.729s] copying perception/path_control.py -> /home/pedro/perception_ws/build/perception/build/lib/perception
+[0.729s] running install
+[0.730s] running install_lib
+[0.730s] copying /home/pedro/perception_ws/build/perception/build/lib/perception/path_control.py -> /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception
+[0.730s] byte-compiling /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception/path_control.py to path_control.cpython-38.pyc
+[0.731s] running install_data
+[0.732s] running install_egg_info
+[0.732s] removing '/home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception-0.0.0-py3.8.egg-info' (and everything under it)
+[0.733s] Copying ../../build/perception/perception.egg-info to /home/pedro/perception_ws/install/perception/lib/python3.8/site-packages/perception-0.0.0-py3.8.egg-info
+[0.733s] running install_scripts
+[0.745s] Installing control script to /home/pedro/perception_ws/install/perception/lib/perception
+[0.745s] Installing keyboard_control script to /home/pedro/perception_ws/install/perception/lib/perception
+[0.745s] Installing novo_path script to /home/pedro/perception_ws/install/perception/lib/perception
+[0.745s] Installing path_control script to /home/pedro/perception_ws/install/perception/lib/perception
+[0.745s] Installing path_planner script to /home/pedro/perception_ws/install/perception/lib/perception
+[0.746s] Installing processing script to /home/pedro/perception_ws/install/perception/lib/perception
+[0.746s] writing list of installed files to '/home/pedro/perception_ws/build/perception/install.log'
+[0.772s] Invoked command in '/home/pedro/perception_ws/src/perception' returned '0': PYTHONPATH=/home/pedro/perception_ws/build/perception/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/pedro/perception_ws/install/perception/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/perception build --build-base /home/pedro/perception_ws/build/perception/build install --record /home/pedro/perception_ws/build/perception/install.log --install-scripts $base/lib/perception --single-version-externally-managed install_data
