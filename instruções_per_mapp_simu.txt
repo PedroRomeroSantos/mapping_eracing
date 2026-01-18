@@ -1,0 +1,58 @@
+## 2. Rodar em 4 terminais
+
+### Terminal A — FSDS Unreal
+cd ~/fsds-v2.1.0-linux
+source /opt/ros/noetic/setup.bash
+./FSDS.sh
+# Escolha o mapa → carro aparece → mova com teclado/joystick
+
+---
+
+### Terminal B — FSDS ROS1 bridge
+cd ~/Formula-Student-Driverless-Simulator/ros
+source /opt/ros/noetic/setup.bash
+source devel/setup.bash
+roslaunch fsds_ros_bridge fsds_ros_bridge.launch
+
+---
+
+### Terminal C — ros1_bridge (Noetic ↔ Foxy)
+source /opt/ros/noetic/setup.bash
+source /opt/ros/foxy/setup.bash
+source ~/ros1_bridge_ws/install/setup.bash
+ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
+
+---
+
+### Terminal D — perception (ROS2 Foxy)
+cd ~/perception_ws
+source /opt/ros/foxy/setup.bash
+source install/setup.bash
+ros2 run perception processing
+
+---
+
+### Terminal E - keyborad com ros1 (tem que clicar no terminal para funcionar)
+source /opt/ros/noetic/setup.bash
+source ~/Formula-Student-Driverless-Simulator/ros/devel/setup.bash
+python3 keyboard_control_ros1.py
+
+### Terminal F - mapa de cones (tem que estar no ros2)
+cd ~/perception_ws
+source /opt/ros/foxy/setup.bash
+source install/setup.bash
+ros2 run perception novo_path
+
+## 3. Testes
+
+- Conferir cones detectados:
+source /opt/ros/foxy/setup.bash
+ros2 topic echo /cones_depth
+
+se der problema no colconbuild
+pip3 uninstall -y setuptools packaging
+pip3 install setuptools==58.2.0 packaging==20.9
+cd ~/perception_ws
+rm -rf build/ install/ log/
+colcon build --packages-select perception
+
