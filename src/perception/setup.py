@@ -25,7 +25,7 @@ setup(
             'path_planner = perception.path_planner:main',
             'novo_path = perception.novo_path:main',
             'control = perception.control:main',
-            'path_control = perception.path_control:main'
+            'path_local = perception.path_local:main'
         ],
     },
 )

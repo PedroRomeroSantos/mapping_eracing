@@ -12,7 +12,7 @@ perception/__init__.py
 perception/control.py
 perception/keyboard_control.py
 perception/novo_path.py
-perception/path_control.py
+perception/path_local.py
 perception/path_planner.py
 perception/processing.py
 perception/processing_original.py
