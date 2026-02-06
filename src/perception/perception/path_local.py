@@ -4,19 +4,18 @@ from std_msgs.msg import Float32MultiArray
 import numpy as np
 import matplotlib.pyplot as plt
 
-# --- CONFIGURAÇÕES ---
 FX = 960.0
 CX = 960.0
 
 LADO_ESQUERDO = -1.0
 LADO_DIREITO = 1.0
-HORIZONTE_MAXIMO = 30.0   # Aumentado para ver mais pares na reta
+HORIZONTE_MAXIMO = 30.0   # ver mais pares na reta
 LARGURA_MAXIMA = 12.0    
 
 ID_CORES = {
-    0: LADO_ESQUERDO,  # Azul
-    1: LADO_DIREITO,   # Amarelo
-    2: 0.0,            # Outros
+    0: LADO_ESQUERDO,
+    1: LADO_DIREITO,
+    2: 0.0,            
 }
 
 def converter_pixel_para_metro(u, z_depth):
@@ -35,25 +34,24 @@ class PathPlanner(Node):
             Float32MultiArray, '/trajectory_waypoints', 10
         )
         
-        # --- CONFIGURAÇÃO DO GRÁFICO ---
+        # GRÁFICO
         self.visualizacao_ativa = True
         if self.visualizacao_ativa:
-            plt.ion() # Modo interativo (não bloqueia o código)
+            plt.ion() 
             self.fig, self.ax = plt.subplots(figsize=(6, 8))
             self.configurar_plot()
 
         self.get_logger().info('Planner com Visualização Iniciado!')
 
     def configurar_plot(self):
-        """Define limites e títulos do gráfico."""
         self.ax.set_title('Visão Local (Carro em 0,0)')
         self.ax.set_xlabel('Lateral X (m)')
         self.ax.set_ylabel('Frente Z (m)')
-        self.ax.set_xlim([-10, 10]) # 10m para cada lado
-        self.ax.set_ylim([0, 35])   # Aumentado para ver o novo horizonte
+        self.ax.set_xlim([-10, 10]) 
+        self.ax.set_ylim([0, 35])
         self.ax.grid(True)
         
-        # Desenha o carro (Triângulo Verde)
+        #carro verde
         self.ax.plot(0, 0, 'g^', markersize=15, label='Carro')
 
     def atualizar_grafico(self, esq, dir, wps):
@@ -63,11 +61,11 @@ class PathPlanner(Node):
         self.ax.clear()
         self.configurar_plot()
 
-        # Plota Cones Esquerda (Azul)
+        #Cones esquerda (Azul)
         if len(esq) > 0:
             self.ax.scatter(esq[:, 0], esq[:, 1], c='blue', label='Esq')
         
-        # Plota Cones Direita (Amarelo/Laranja)
+        #Cones direita (Amarelo)
         if len(dir) > 0:
             self.ax.scatter(dir[:, 0], dir[:, 1], c='orange', label='Dir')
 
@@ -75,7 +73,7 @@ class PathPlanner(Node):
         if len(wps) > 0:
             self.ax.plot(wps[:, 0], wps[:, 1], 'r--', alpha=0.5) # Linha
             self.ax.scatter(wps[:, 0], wps[:, 1], c='red', marker='x', s=80, label='Target')
-            # Destaca o alvo imediato
+            #o alvo imediato
             self.ax.scatter(wps[0, 0], wps[0, 1], c='darkred', s=150)
 
         self.ax.legend(loc='upper right')
@@ -91,7 +89,7 @@ class PathPlanner(Node):
         cones_esquerda = []
         cones_direita = []
 
-        # 1. Converter e Separar
+        #Converter e separar
         for cone in dados_brutos:
             u, v, z, id_cor = cone
             
@@ -110,26 +108,26 @@ class PathPlanner(Node):
         cones_esquerda = np.array(cones_esquerda)
         cones_direita = np.array(cones_direita)
 
-        # 2. Calcular Caminho
+        # Calcular caminho
         waypoints = np.array([])
         if len(cones_esquerda) > 0 and len(cones_direita) > 0:
             waypoints = self.calcular_ponto_medio(cones_esquerda, cones_direita)
 
-        # 3. Publicar
+        #Publicar
         if len(waypoints) > 0:
             waypoints = waypoints[np.argsort(waypoints[:, 1])]
             msg_saida = Float32MultiArray()
             msg_saida.data = waypoints.flatten().tolist()
             self.waypoints_pub.publish(msg_saida)
 
-        # 4. Atualizar Visualização
+        #Atualizar visualização
         self.atualizar_grafico(cones_esquerda, cones_direita, waypoints)
 
     def calcular_ponto_medio(self, esquerda, direita):
         pontos_medios = []
-        indices_usados = set() # Evita repetir o mesmo cone da direita
+        indices_usados = set() #evita repetir o mesmo cone da direita
         
-        # Ordena para tentar parear por proximidade
+        #ordena para tentar parear por proximidade
         esquerda = esquerda[np.argsort(esquerda[:, 1])]
         direita = direita[np.argsort(direita[:, 1])]
 
@@ -139,19 +137,19 @@ class PathPlanner(Node):
             melhor_idx = -1
             menor_diff = float('inf')
 
-            # Procura o melhor par na direita (Greedy Match)
+            #procura o melhor par na direita
             for i, cone_dir in enumerate(direita):
-                if i in indices_usados: continue # Já foi usado por outro cone
+                if i in indices_usados: continue #se já foi usado por outro cone
 
                 z_dir = cone_dir[1]
                 diff_z = abs(z_esq - z_dir)
 
-                # Critério: Diferença de Z menor que 5m e o menor que encontrar
+                #Diferença de Z menor que 5m e o menor que encontrar
                 if diff_z < 5.0 and diff_z < menor_diff:
                     menor_diff = diff_z
                     melhor_idx = i
             
-            # Se achou um par válido
+            #achou um par válido
             if melhor_idx != -1:
                 cone_dir = direita[melhor_idx]
                 x_dir, z_dir = cone_dir[0], cone_dir[1]
