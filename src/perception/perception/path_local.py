@@ -41,7 +41,7 @@ class PathPlanner(Node):
             self.fig, self.ax = plt.subplots(figsize=(6, 8))
             self.configurar_plot()
 
-        self.get_logger().info('Planner com Visualização Iniciado!')
+        self.get_logger().info('Planner iniciado')
 
     def configurar_plot(self):
         self.ax.set_title('Visão Local (Carro em 0,0)')
