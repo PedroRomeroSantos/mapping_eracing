@@ -1,3 +1,19 @@
+NOVO 
+1 abrir simulador
+
+cd ~/fsds-v2.1.0-linux
+source /opt/ros/noetic/setup.bash
+./FSDS.sh
+
+2 abrir ambiente virtual 
+source venv/bin/activate
+
+3 rodar main
+python3 main_FINAL.py
+
+4 rodar controle teclado
+python3 keyboard_FINAL.py
+
 ## 2. Rodar em 4 terminais
 
 ### Terminal A — FSDS Unreal
