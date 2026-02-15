@@ -1,104 +1,106 @@
 import rclpy 
 from rclpy.node import Node
-from sensor_msgs.msg import Image
-from nav_msgs.msg import Odometry 
 from std_msgs.msg import Float32MultiArray
+from sensor_msgs.msg import Image
 import numpy as np
 import cv2
 from cv_bridge import CvBridge
 from ultralytics import YOLO
+import torch
 
-
-fx = 960
-fy = 540
-cx = 960
-cy = 540
-COLOR_THRESHOLD = 0.75 
+# =========================================================
+# CONFIGURAÇÕES DE CÂMERA (Baseadas na ZED 720p)
+# =========================================================
+FX, FY = 640.0, 640.0
+CX, CY = 640.0, 360.0
+CONF_THRESHOLD = 0.85 
 
 class PerceptionNode(Node): 
     def __init__(self):
-        super().__init__('PerceptionNode') 
+        super().__init__('perception_node') 
         
-        self.imageReceiver = self.create_subscription(Image,'/fsds/camera/ZED2iImage',self.imageCallback,10)
-        self.depthReceiver = self.create_subscription(Image,'/fsds/camera/ZED2iDepth',self.depthCallback,10)
-        self.odom_sub = self.create_subscription(Odometry,'/fsds/testing_only/odom',self.gpsCallback,10)
+        # Subscribers e Publishers
+        self.imageReceiver = self.create_subscription(Image, '/fsds/camera/ZED_RGB', self.imageCallback, 10)
+        self.depthReceiver = self.create_subscription(Image, '/fsds/camera/ZED_Depth', self.depthCallback, 10)
+        self.perceptionOutput = self.create_publisher(Float32MultiArray, '/cones', 10)
+        self.yoloDebug = self.create_publisher(Image, '/perception/debug', 10)
 
-        self.yoloDebug = self.create_publisher(Image,'yoloDebug',10) 
-        self.perceptionOutput = self.create_publisher(Float32MultiArray,'cones',10) 
-        self.gpsOutput = self.create_publisher(Float32MultiArray,'/carGPS',10)
+        # Carregamento do Modelo
+        model_path = "/home/pedro/mapping_eracing/16_01.pt" 
+        self.get_logger().info(f'Carregando modelo PyTorch: {model_path}')
+        
+        try:
+            self.model = YOLO(model_path)
+            if torch.cuda.is_available():
+                self.model.to('cuda')
+                self.get_logger().info(f'GPU ATIVA: {torch.cuda.get_device_name(0)}')
+        except Exception as e:
+            self.get_logger().error(f'Erro ao carregar modelo: {e}')
 
-        self.model = YOLO('/home/pedro/best.onnx') 
         self.bridge = CvBridge()
-        
+        self.latest_depth_img = None
 
-        self.cones = []      
-        self.cones3D = []     
-
-    def gpsCallback(self, msg):
-        """odometria e publica a posição global em /carGPS"""
-        x = msg.pose.pose.position.x
-        y = msg.pose.pose.position.y
-        z = msg.pose.pose.position.z
-
-        output = Float32MultiArray()
-        output.data = [x, y, z]
-        self.gpsOutput.publish(output)
+    def depthCallback(self, msg):
+        self.latest_depth_img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='32FC1')
 
     def imageCallback(self, msg):
-       
-        frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-        
-        results = self.model.predict(frame, verbose=False) 
-        r = results[0]  
+        if self.latest_depth_img is None: return
 
-        imgDebug = r.plot() 
-        imgDebug_msg = self.bridge.cv2_to_imgmsg(imgDebug, encoding='bgr8')
-        self.yoloDebug.publish(imgDebug_msg)
-
-        detections = r.boxes.xywh.cpu().numpy() 
-        classes = r.boxes.cls.cpu().numpy()     
-        confs = r.boxes.conf.cpu().numpy()        
-
-        self.cones.clear() 
-
-        for (xCentro, yCentro, w, h), conf, label in zip(detections, confs, classes):
-            if conf < COLOR_THRESHOLD:
-                continue
-
-            self.cones.append([float(xCentro), float(yCentro), int(label)])
+        try:
+            frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            results = self.model.predict(source=frame, conf=CONF_THRESHOLD, device='cuda', verbose=False)
             
-    def depthCallback(self, msg):
+            r = results[0]
+            self.yoloDebug.publish(self.bridge.cv2_to_imgmsg(r.plot(), encoding='bgr8'))
 
-        depthMatrix = self.bridge.imgmsg_to_cv2(msg, desired_encoding='32FC1')
-
-        cones3D_map = [] 
-
-        for cone in self.cones: 
-            u = int(cone[0])  
-            v = int(cone[1])  
-            label = cone[2]
+            boxes = r.boxes.xywh.cpu().numpy()
+            classes = r.boxes.cls.cpu().numpy()
             
+            raw_detections = []
+            h_img, w_img = self.latest_depth_img.shape
 
-            Z = depthMatrix[v, u] 
+            for (x, y, w, h), label in zip(boxes, classes):
+                u, v = int(x), int(y)
+                if 0 <= u < w_img and 0 <= v < h_img:
+                    Z = self.latest_depth_img[v, u]
+                    if not np.isnan(Z) and 0.5 < Z < 40.0:
+                        X = (u - CX) * Z / FX
+                        raw_detections.append({'pos': [float(X), float(Z)], 'id': int(label)})
 
-            if Z > 30: 
-                continue
+            # --- CORREÇÃO DO SPATIAL NMS ---
+            # Mantemos como lista de listas para a comparação funcionar
+            filtered_cones = []
+            for det in raw_detections:
+                is_duplicate = False
+                for accepted in filtered_cones:
+                    # Agora 'accepted' é [X, Z, ID], então [:2] funciona!
+                    dist = np.linalg.norm(np.array(det['pos']) - np.array(accepted[:2]))
+                    if dist < 1.2:
+                        is_duplicate = True
+                        break
+                
+                if not is_duplicate:
+                    filtered_cones.append([det['pos'][0], det['pos'][1], float(det['id'])])
 
-            cones3D_map.append([float(u), float(v), Z, label]) 
+            if filtered_cones:
+                out_msg = Float32MultiArray()
+                # Achata a lista apenas no momento de enviar a mensagem
+                out_msg.data = np.array(filtered_cones).flatten().tolist()
+                self.perceptionOutput.publish(out_msg)
 
-        msg_out = Float32MultiArray()
-        msg_out.data = np.array(cones3D_map, dtype=np.float32).flatten().tolist()
-        self.perceptionOutput.publish(msg_out) 
-
-        self.cones.clear()
-        self.cones3D = cones3D_map 
+        except Exception as e:
+            self.get_logger().error(f'Erro Percepção: {e}')
 
 def main():
     rclpy.init()
     node = PerceptionNode()
-    rclpy.spin(node)
-    node.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
-if __name__=="__main__":
+if __name__ == '__main__':
     main()
