@@ -3,7 +3,8 @@ NOVO
 
 cd ~/fsds-v2.1.0-linux
 source /opt/ros/noetic/setup.bash
-./FSDS.sh
+./FSDS.sh -windowed -ResX=1280 -ResY=720
+
 
 2 abrir ambiente virtual 
 source venv/bin/activate
