@@ -7,29 +7,26 @@ def main():
         sensor = PerceptionSystem()
         planner = PathPlanner()
     except Exception as e:
-        print("Erro ao inicializar sistemas:", e)
+        print(f"Falha na inicialização: {e}")
         return
 
-    print("iniciou")
+    print("=== Sistema de Mapeamento Reativo Iniciado ===")
 
     try:
         while True:
-            # [[Lateral, Profundidade, ID]
             cones = sensor.detect_cones()
-            
-            # calcula pontos médios
             waypoints = planner.calcular_trajetoria(cones)
             
             if len(waypoints) > 0:
-                # Z mais próximo para mostrar o alvo imediato
-                wps_ordenados = waypoints[waypoints[:, 1].argsort()]
-                target = wps_ordenados[0]
-                print(f"Target Imediato -> X (Lat): {target[0]:.2f} | Z (Prof): {target[1]:.2f} | Total WPs: {len(waypoints)}")
+                # O waypoint[0] = Target imediato
+                target = waypoints[waypoints[:, 1].argsort()][0]
+                print(f"Target -> X: {target[0]:.2f}m | Z: {target[1]:.2f}m | Cones: {len(cones)}")
             else:
-                print("Procurando cones...")
+                print("Aguardando detecção de pares de cones...")
+            time.sleep(0.02) 
 
     except KeyboardInterrupt:
-        print("\nEncerrando...")
+        print("\nDesligando sistemas...")
 
 if __name__ == "__main__":
     main()
