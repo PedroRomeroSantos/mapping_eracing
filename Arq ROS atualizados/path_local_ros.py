@@ -7,7 +7,7 @@ import time
 
 class PathPlanner(Node):
     def __init__(self):
-        super().__init__('planner_local_visual')
+        super().__init__('planner_local')
         
         #1 para evitar parear cones colados
         self.LARGURA_MIN = 1.0   

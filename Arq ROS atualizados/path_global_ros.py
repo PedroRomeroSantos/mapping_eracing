@@ -61,10 +61,9 @@ class PathPlanner(Node):
         self.configurar_plot()
 
     def configurar_plot(self):
-        """Define os títulos e eixos do gráfico."""
-        self.ax.set_title('Planejamento Global (GPS + Cones)')
-        self.ax.set_xlabel('Posição Global X (m)')
-        self.ax.set_ylabel('Posição Global Z (m)') 
+        self.ax.set_title('Glbal')
+        self.ax.set_xlabel('X (m)')
+        self.ax.set_ylabel('Z (m)') 
         self.ax.set_aspect('equal', adjustable='box')
         self.ax.grid(True)
 
@@ -160,13 +159,17 @@ class PathPlanner(Node):
         #pareamento inteligente
         paired_midpoints, paired_cones_full = self._pair_and_calculate(cones_left_data, cones_right_data)
 
-        #waypoints válidos, atualiza tudo
         if len(paired_midpoints) > 0:
             with self.lock:
-                 self.current_paired_cones = paired_cones_full
-                 self.current_midpoints = paired_midpoints
-            
-            self._publish_waypoints(paired_midpoints)
+                    self.current_paired_cones = paired_cones_full
+                    self.current_midpoints = paired_midpoints
+                    
+            local_waypoints = np.copy(paired_midpoints)
+            local_waypoints[:, 0] -= car_x_atual
+            local_waypoints[:, 1] -= car_z_atual
+            local_waypoints = local_waypoints[np.argsort(local_waypoints[:, 1])]
+                    
+            self._publish_waypoints(local_waypoints)
             self._update_plot()
            
     def _pair_and_calculate(self, cones_left_data, cones_right_data):
