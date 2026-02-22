@@ -1,16 +1,17 @@
 import time
+import fsds
 from perception_FINAL import PerceptionSystem
 from path_FINAL import PathPlanner
+from controller_FINAL import PurePursuitController
 
 def main():
-    try:
-        sensor = PerceptionSystem()
-        planner = PathPlanner()
-    except Exception as e:
-        print(f"Falha na inicialização: {e}")
-        return
+    sensor = PerceptionSystem()
+    planner = PathPlanner()
+    controller = PurePursuitController()
+        
+    sensor.client.enableApiControl(True)
 
-    print("=== Sistema de Mapeamento Reativo Iniciado ===")
+    print("perception, path e controle ON")
 
     try:
         while True:
@@ -18,15 +19,26 @@ def main():
             waypoints = planner.calcular_trajetoria(cones)
             
             if len(waypoints) > 0:
-                # O waypoint[0] = Target imediato
-                target = waypoints[waypoints[:, 1].argsort()][0]
-                print(f"Target -> X: {target[0]:.2f}m | Z: {target[1]:.2f}m | Cones: {len(cones)}")
+                throttle, steering, brake = controller.calculate_controls(waypoints)
+                
+                car_controls = fsds.CarControls()
+                car_controls.throttle = throttle
+                car_controls.steering = steering
+                car_controls.brake = brake
+                
+                sensor.client.setCarControls(car_controls)
+                
+                print(f"Controle = STR: {steering:5.2f} | THR: {throttle:5.2f} | WPs: {len(waypoints)}")
             else:
+                #se não vir cones freia um pouco
+                sensor.client.setCarControls(fsds.CarControls(brake=0.5))
                 print("Aguardando detecção de pares de cones...")
-            time.sleep(0.02) 
+
+            time.sleep(0.02)
 
     except KeyboardInterrupt:
-        print("\nDesligando sistemas...")
+        sensor.client.setCarControls(fsds.CarControls(brake=1.0, throttle=0.0))
+        print("\nOFF")
 
 if __name__ == "__main__":
     main()
