@@ -1,8 +1,8 @@
 import time
 import fsds
 from perception_FINAL import PerceptionSystem
-from path_FINAL import PathPlanner
-from controller_FINAL import PurePursuitController
+from path_local_FINAL import PathPlanner
+from controle_FINAL import PurePursuitController
 
 def main():
     sensor = PerceptionSystem()

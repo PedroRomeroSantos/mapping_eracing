@@ -2,50 +2,20 @@ import numpy as np
 
 class PurePursuitController:
     def __init__(self):
-        print("Inicializando Controlador Pure Pursuit...")
-        
-        self.K_P_STEER = 0.45   #ganho proporcional KP
-        self.LOOK_AHEAD_DIST = 6.0 #distância que considera na frente
-        self.MAX_STEER = 1.0    #limite de esterço do simulador (-1 a 1)
-        
-        #vel alvo
-        self.TARGET_THROTTLE = 0.25
-        self.MIN_THROTTLE = 0.12
+        self.KP_STEER = 1
+        self.LOOK_AHEAD = 10
+        self.MAX_THR = 0.20
+        self.MIN_THR = 0.15
 
-    def calculate_controls(self, waypoints):
-        #Recebe waypoints: [[X_lateral, Z_frente], ...]
-        #Retorna: (throttle, steering, brake)
-        if len(waypoints) == 0:
-            return 0.0, 0.0, 0.5 #para o carro se não tem caminho
-          
-        #waypoint que está mais perto da distância alvo
-        target_pt = self._get_lookahead_point(waypoints)
-        
-        tx, tz = target_pt[0], target_pt[1]
-
-        #esterço, erro angular
+    def calculate_controls(self, wps_locais):
+        if len(wps_locais) == 0: return 0.0, 0.0, 1
+        dists = np.sqrt(wps_locais[:, 0]**2 + wps_locais[:, 1]**2)
+        idx = np.argmin(np.abs(dists - self.LOOK_AHEAD))
+        target = wps_locais[idx]
+        tx, tz = target[0], target[1]
         dist_sq = tx**2 + tz**2
-        if dist_sq > 0:
-            steering = (2 * tx) / dist_sq
-        else:
-            steering = 0.0
-          
-        steering_cmd = np.clip(steering * self.K_P_STEER, -self.MAX_STEER, self.MAX_STEER)
-
-        #acelerador pra frente
-        steer_factor = abs(steering_cmd)
-        throttle_cmd = self.TARGET_THROTTLE * (1.0 - 0.5 * steer_factor)
-        throttle_cmd = max(throttle_cmd, self.MIN_THROTTLE)
-
-        return float(throttle_cmd), float(steering_cmd), 0.0
-
-    def _get_lookahead_point(self, waypoints):
-        #waypoint mais próximo da distância LOOK_AHEAD_DIST
-        pts = waypoints[waypoints[:, 1].argsort()]
-        
-        for pt in pts:
-            dist = np.sqrt(pt[0]**2 + pt[1]**2)
-            if dist >= self.LOOK_AHEAD_DIST:
-                return pt
-        
-        return pts[-1]
+        steer = (2 * tx) / dist_sq if dist_sq > 0 else 0.0
+        steer_cmd = np.clip(steer * self.KP_STEER, -1.0, 1.0)
+        throttle = self.MAX_THR * (1.0 - abs(steer_cmd) * 1.25)
+        throttle = max(throttle, self.MIN_THR)
+        return float(throttle), float(steer_cmd), 0.0
