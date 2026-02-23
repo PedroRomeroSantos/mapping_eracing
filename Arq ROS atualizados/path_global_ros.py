@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
+from geometry_msgs.msg import Point
 import numpy as np
 import matplotlib.pyplot as plt
 import threading 
@@ -13,7 +14,7 @@ LADO_DIREITO = 1.0   #Amarelo
 HORIZONTE_PLANEJAMENTO = 30.0  
 #largura máxima entre um par de cones
 LARGURA_MAX_PISTA = 12.0       
-#diferença máxima de profundidade (Z) entre um cone azul e um amarelo
+#diferença máxima de profundidade z entre um cone azul e um amarelo
 DELTA_Z_MAX = 5.0
 
 #vizualização do gráfico
@@ -50,8 +51,8 @@ class PathPlanner(Node):
         )
         
         self.waypoints_pub = self.create_publisher(
-            Float32MultiArray, 
-            '/waypoints', 
+            Point, 
+            '/waypoints_go', 
             10
         )
         
@@ -61,9 +62,10 @@ class PathPlanner(Node):
         self.configurar_plot()
 
     def configurar_plot(self):
-        self.ax.set_title('Glbal')
-        self.ax.set_xlabel('X (m)')
-        self.ax.set_ylabel('Z (m)') 
+        """Define os títulos e eixos do gráfico."""
+        self.ax.set_title('Planejamento Global (GPS + Cones)')
+        self.ax.set_xlabel('Posição Global X (m)')
+        self.ax.set_ylabel('Posição Global Z (m)') 
         self.ax.set_aspect('equal', adjustable='box')
         self.ax.grid(True)
 
@@ -131,7 +133,7 @@ class PathPlanner(Node):
         for cone in data_raw:
             x_local = cone[0] #distância lateral em relação ao carro
             z_local = cone[1] # distância frontal em relação ao carro
-            label_id = cone[2] # Cor (0 ou 1)
+            label_id = cone[2] # cor (0 ou 1)
             
             #se o cone está muito longe ou atrás do carro (z < 0)
             if z_local > HORIZONTE_PLANEJAMENTO:
@@ -140,7 +142,7 @@ class PathPlanner(Node):
             if z_local <= 0.0:
                 continue # ignora o cone
 
-            #Global: Posição Mundo = Posição Carro + Posição Relativa
+            #global: posição mundo = posição carro + posição relativa
             X_map = car_x_atual + x_local
             Z_map = car_z_atual + z_local 
             
@@ -152,24 +154,26 @@ class PathPlanner(Node):
         if len(working_data) == 0:
              return
 
-        # Separa esquerda (Azul) direita (Amarelo)
+        #separa azul amarelo
         cones_left_data = working_data[working_data[:, 2] == LADO_ESQUERDO] 
         cones_right_data = working_data[working_data[:, 2] == LADO_DIREITO]
         
         #pareamento inteligente
         paired_midpoints, paired_cones_full = self._pair_and_calculate(cones_left_data, cones_right_data)
 
+        #waypoints válidos, atualiza tudo
         if len(paired_midpoints) > 0:
             with self.lock:
-                    self.current_paired_cones = paired_cones_full
-                    self.current_midpoints = paired_midpoints
-                    
+                 self.current_paired_cones = paired_cones_full
+                 self.current_midpoints = paired_midpoints
+            
+            #conversão para o referencial do carro e ordenação
             local_waypoints = np.copy(paired_midpoints)
             local_waypoints[:, 0] -= car_x_atual
             local_waypoints[:, 1] -= car_z_atual
             local_waypoints = local_waypoints[np.argsort(local_waypoints[:, 1])]
-                    
-            self._publish_waypoints(local_waypoints)
+            
+            self._publish_waypoints(local_waypoints[0])
             self._update_plot()
            
     def _pair_and_calculate(self, cones_left_data, cones_right_data):
@@ -182,7 +186,7 @@ class PathPlanner(Node):
         if len(cones_right_data) == 0:
              return np.array([]), np.array([])
 
-        #ordena os cones da esquerda pela profundidade (Z)
+        #ordena os cones da esquerda pela profundidade z
         cones_left_data = cones_left_data[np.argsort(cones_left_data[:, 1])]
         midpoints = []
         all_paired_cones = []
@@ -204,10 +208,10 @@ class PathPlanner(Node):
             cone_R_x = cone_R_full[0]
             cone_R_z = cone_R_full[1]
             
-            #distância Lateral (X)
+            #distância lateral x
             distancia_x = np.abs(cone_L_x - cone_R_x)
             
-            #distância Profundidade (Z)
+            #distância profundidade z
             distancia_z = np.abs(cone_L_z - cone_R_z)
             
             #validade do par
@@ -226,10 +230,12 @@ class PathPlanner(Node):
         else:
             return np.array([]), np.array([])
 
-    def _publish_waypoints(self, waypoints):
-        msg = Float32MultiArray()
-        #transforma [[x1,z1], [x2,z2]] em [x1, z1, x2, z2] e converte para lista ROS aceita
-        msg.data = waypoints.flatten().tolist()
+    def _publish_waypoints(self, target_wp):
+        #usa Z em Y para facilitar controle
+        msg = Point()
+        msg.x = float(target_wp[0]) #dist lateral em relação ao carro
+        msg.y = float(target_wp[1]) #dist frente em relação ao carro
+        msg.z = 0.0
         
         self.waypoints_pub.publish(msg)
 
