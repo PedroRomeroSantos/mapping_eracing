@@ -8,8 +8,8 @@ fsds_path = os.path.join(os.path.expanduser("~"), "Formula-Student-Driverless-Si
 if fsds_path not in sys.path: sys.path.insert(0, fsds_path)
 import fsds 
 
-FX, CX = 640.0, 640.0
-FY, CY = 640.0, 360.0
+FX, CX = 640, 640
+FY, CY = 640, 360
 CONF_THRESHOLD = 0.85
 ANGLE_MATCH = 30.0 
 
