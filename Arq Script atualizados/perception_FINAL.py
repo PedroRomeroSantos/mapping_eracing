@@ -8,8 +8,7 @@ fsds_path = os.path.join(os.path.expanduser("~"), "Formula-Student-Driverless-Si
 if fsds_path not in sys.path: sys.path.insert(0, fsds_path)
 import fsds 
 
-FX, CX = 640, 640
-FY, CY = 640, 360
+FX, CX = 640.0, 640.0
 CONF_THRESHOLD = 0.85
 ANGLE_MATCH = 30.0 
 
@@ -20,21 +19,28 @@ class PerceptionSystem:
         self.model = YOLO("/home/pedro/mapping_eracing/16_01.pt")
 
     def get_lidar_match(self, points, u, v):
-        ray = np.array([1.0, (u - CX)/FX, (v - CY)/FY])
-        ray /= np.linalg.norm(ray)
+        ray_2d = np.array([1.0, (u - CX)/FX])
+        ray_2d /= np.linalg.norm(ray_2d)
 
-        norms = np.linalg.norm(points, axis=1)
-        valid_points = points[norms > 0.1]
+        points_2d = points[:, :2]
+        norms = np.linalg.norm(points_2d, axis=1)
+        
+        valid_mask = norms > 0.1
+        valid_points = points[valid_mask]
+        valid_points_2d = points_2d[valid_mask]
+        valid_norms = norms[valid_mask]
+
         if valid_points.size == 0: return None
 
-        dirs = valid_points / np.linalg.norm(valid_points, axis=1)[:, None]
-        cos_angles = dirs @ ray
+        dirs_2d = valid_points_2d / valid_norms[:, None]
+        cos_angles = dirs_2d @ ray_2d
         
         mask = cos_angles > np.cos(np.deg2rad(ANGLE_MATCH))
         candidates = valid_points[mask]
 
         if candidates.size == 0: return None
-        return candidates[np.argmin(np.linalg.norm(candidates, axis=1))]
+    
+        return candidates[np.argmin(np.linalg.norm(candidates[:, :2], axis=1))]
 
     def detect_cones(self):
         [img] = self.client.simGetImages([fsds.ImageRequest("ZED_RGB", fsds.ImageType.Scene)])
@@ -54,8 +60,12 @@ class PerceptionSystem:
             hit = self.get_lidar_match(points, u, v)
 
             if hit is not None:
+                #LiDAR só para a profundidade
                 x_frente = float(hit[0])
-                y_lateral = float(hit[1])
+                
+                #posição lateral
+                y_lateral = (u - CX) * x_frente / FX
+                
                 if 0.5 < x_frente < 35.0:
                     raw_detections.append([y_lateral, x_frente, class_id])
 
