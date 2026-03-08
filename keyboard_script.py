@@ -21,8 +21,7 @@ class KeyboardControlFSDS:
         self.listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
         self.listener.start()
 
-        print("Controle Manual FSDS Iniciado.")
-        print("W=Acelera, S=Freia, A=Esquerda, D=Direita, Espaço=Handbrake, R=Reset, Q=Sair")
+        print("controle teclado ON")
 
     def on_press(self, key):
         try:

@@ -1,6 +1,8 @@
 import os
 import sys
 import airsim
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
 
 fsds_lib_path = os.path.join(os.path.expanduser("~"), "Formula-Student-Driverless-Simulator", "python")
 sys.path.insert(0, fsds_lib_path)
@@ -25,7 +27,6 @@ class _BigUnpacker(_OrigUnpacker):
         super().__init__(*args, **kwargs)
 _msgpack.Unpacker = _BigUnpacker
 
-
 MODEL_PATH = "/home/pedro/mapping_eracing/16_01.pt"
 VEHICLE    = "FSCar"
 
@@ -40,9 +41,6 @@ def waypoint_mais_proximo(waypoints):
     msg.z = float(waypoints[idx, 1])   # profundidade
     return msg
 
-
-
-
 def main():
     rclpy.init()
     node = Node("waypoint_publisher")
@@ -50,7 +48,8 @@ def main():
     acceleration = node.create_publisher(Float32,"car_acceleration",1)
     orientation = node.create_publisher(Float32MultiArray,'car_orientation',1)
     pub  = node.create_publisher(Point, "/waypoint_go", 10)
-    
+    img_pub = node.create_publisher(Image, "/camera/yolo_debug", 10)
+    bridge = CvBridge()
 
     client = fsds.FSDSClient()
     client.confirmConnection()
@@ -62,7 +61,12 @@ def main():
 
     while True:
             car_state = client.getCarState(VEHICLE)
-            cones, _ = percepcao.capturar_e_processar()
+            cones, debug_img = percepcao.capturar_e_processar()
+            
+            if debug_img is not None:
+                img_msg = bridge.cv2_to_imgmsg(debug_img, encoding="bgr8")
+                img_pub.publish(img_msg)
+
             waypoints = planner.calcular_trajetoria(cones)
 
             wp = waypoint_mais_proximo(waypoints)

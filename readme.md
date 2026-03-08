@@ -10,6 +10,9 @@ This repository contains the software pipeline for the autonomous vehicle (FSAE)
 * **Simulator and Path Planning Integrated:**
 ![Simulator running with Path Planning](images/simulador+path.png)
 
+* **Labeling the cones with YOLO and ZED2i.**
+![Image from ZED2i + YOLO labeling the cones](images/label_yolo_zed2i.png)
+
 ### Requirements
 * `numpy`, `matplotlib`, `opencv-python`
 * `ultralytics` (YOLOv8), `torch`
