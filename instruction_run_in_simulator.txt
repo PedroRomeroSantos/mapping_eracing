@@ -10,6 +10,7 @@ source /opt/ros/noetic/setup.bash
 source venv/bin/activate
 
 3 rodar main
+source /opt/ros/foxy/setup.bash
 python3 main_FINAL.py
 
 4 rodar controle teclado
